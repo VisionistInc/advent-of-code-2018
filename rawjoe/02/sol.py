@@ -3,15 +3,13 @@ with open('input', 'r') as file:
 
 lines = input.split()
 
-from string import ascii_lowercase
-
 two_cnt = 0
 three_cnt = 0
 
 for line in lines:
     two = False
     three = False
-    for c in ascii_lowercase:
+    for c in line:
         if line.count(c) == 2:
             two = True
         if line.count(c) == 3:
