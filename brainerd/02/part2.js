@@ -1,5 +1,5 @@
 const input = require('./input');
-console.log(input.length)
+
 let foundResult = false;
 let chrisisawesome = true;
 
