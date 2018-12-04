@@ -36,18 +36,12 @@ const output = input.reduce(
     acc.ids.add(id);
 
     claimCoordinates.forEach(coordinates => {
-      if (acc.seenCoordinates.has(coordinates)) {
-        acc.seenOverlaps.add(coordinates);
-
-        const overlappedIds = acc.coordinatesToIds[coordinates] || [];
-
-        [id, ...overlappedIds].map(id => acc.overlappedIds.add(id));
-      } else {
-        acc.seenCoordinates.add(coordinates);
-      }
-
       if (acc.coordinatesToIds[coordinates]) {
         acc.coordinatesToIds[coordinates].push(id);
+
+        acc.coordinatesToIds[coordinates].forEach(id =>
+          acc.overlappedIds.add(id)
+        );
       } else {
         acc.coordinatesToIds[coordinates] = [id];
       }
@@ -59,8 +53,6 @@ const output = input.reduce(
     return acc;
   },
   {
-    seenCoordinates: new Set(),
-    seenOverlaps: new Set(),
     ids: new Set(),
     overlappedIds: new Set(),
     coordinatesToIds: {}
