@@ -25,15 +25,21 @@ fun main(args : Array<String>) {
   for ((index, candidate) in boxIDsIterator.withIndex()) {
     var remainingIDsIterator = boxIDs.listIterator(index + 1)
     remainingIDsIterator.forEach {
-      if (candidate != it) {
-        print(candidate)
-        print(" -- ")
-        println(it)
+      var numDiffs = 0
+      var diffIndex = 0
+      for (cIndex in candidate.indices) {
+          if (candidate[cIndex] != it[cIndex]) {
+              numDiffs++
+              diffIndex = cIndex
+          }
       }
-
-
+      
+      if (numDiffs == 1) {
+          // candidate and it are the two strings with only 1 difference
+          println(candidate.removeRange(diffIndex, diffIndex + 1))
+          return
+      }
     }
   }
 
-  println(boxIDs)
 }
