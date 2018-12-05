@@ -1,7 +1,6 @@
 let puzzinput = require('./input');
 
 const myFunc = inp => {
-  console.log('inp.length = ', inp.length);
   let alphabet = 'abcdefghijklmnopqrstuvwxzy';
   var matches = []
   alphabet.split("").forEach(letter => {
@@ -22,7 +21,6 @@ const myFunc = inp => {
     chunksOdd = chunksOdd.filter(chunk => (matches.indexOf(chunk) === -1 && chunk.length == 2)|| chunk.length != 2);
     input = chunksOdd.join("").trim();
     if (input.length == length) {
-      console.log('length for that letter is ', length);
       throw new Error(length)
     }
     length = input.length;
