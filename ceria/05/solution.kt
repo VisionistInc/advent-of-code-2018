@@ -1,48 +1,36 @@
 import java.io.File;
 
+var keepGoing = true
+
 fun main(args : Array<String>) {
 
-  var polymer = File(args.first()).readLines()
- 
-  // Answer to part 1
-  println(reactPolymer(polymer.first()))
+  var origPolymer = File(args.first()).readLines().first().toCharArray()
+  // Answer to part 1 -- tried to use true recursion, but kept getting stackoverflow...
+  var newPolymer = reactPolymer(origPolymer)
+  while (keepGoing) {
+    newPolymer = reactPolymer(newPolymer)
+  }
+  println(newPolymer.size)
+
+  return
 }
 
-private fun reactPolymer(polymer: String) :String {    
-     var newPolymer = polymer 
-     for ((index, candidate) in polymer.withIndex()) {
-         if (index+1 < polymer.length) {
-          if (candidate.equals(polymer[index+1], ignoreCase = true)) {
-            if ((candidate.isUpperCase() && polymer[index+1].isLowerCase()) || (candidate.isLowerCase() && polymer[index+1].isUpperCase())) {
-               //  return reactPolymer(polymer.removeRange(index, index+2))  <- stack overflows
-                newPolymer = reactPolymer(polymer.removeRange(index, index+2))
+private fun reactPolymer(polymer: CharArray) :CharArray {
+     var newPolymer = CharArray(polymer.size)
+     var index = 0
+
+     while (keepGoing) {
+       if (index+1 < polymer.size) {
+          if (polymer.get(index).equals(polymer.get(index+1), ignoreCase = true)) {
+            if ((polymer.get(index).isUpperCase() && polymer.get(index+1).isLowerCase()) || (polymer.get(index).isLowerCase() && polymer.get(index+1).isUpperCase())) {
+                newPolymer = polymer.copyOfRange(0,index) + polymer.copyOfRange(index+2, polymer.size)
                 break
             }
           }
-        }
+          index++
+      } else {
+        keepGoing = false
+      }
      }
-
-    if (newPolymer != polymer) {
-        reactPolymer(newPolymer)
-    }
-
      return newPolymer
-
-//    var newPolymer = polymer.toMutableList()
-//     //var polymerChars = polymer.toCharArray()
-//      for ((index, candidate) in newPolymer.withIndex()) {
-//          if (index+1 < newPolymer.size) {
-//           if (candidate.equals(polymer[index+1], ignoreCase = true)) {
-//             if ((candidate.isUpperCase() && polymer[index+1].isLowerCase()) || (candidate.isLowerCase() && polymer[index+1].isUpperCase())) {
-//                 //return reactPolymer(polymer.removeRange(index, index+2))
-//                 newPolymer.removeAt(index)
-//                 newPolymer.removeAt(index+1)
-//                 reactPolymer(newPolymer)
-//             }
-//           }
-//         }
-//      }
-
-//    return String(newPolymer.toCharArray())
-
 }
