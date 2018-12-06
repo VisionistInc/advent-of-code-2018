@@ -5,13 +5,30 @@ var keepGoing = true
 fun main(args : Array<String>) {
 
   var origPolymer = File(args.first()).readLines().first().toCharArray()
-  // Answer to part 1 -- tried to use true recursion, but kept getting stackoverflow...
-  var newPolymer = reactPolymer(origPolymer)
-  while (keepGoing) {
-    newPolymer = reactPolymer(newPolymer)
-  }
-  println(newPolymer.size)
 
+  // Answer to part 1 -- tried to use true recursion, but kept getting stackoverflow...
+  // var newPolymer = reactPolymer(origPolymer)
+  // while (keepGoing) {
+  //   newPolymer = reactPolymer(newPolymer)
+  // }
+  // println(newPolymer.size)
+
+  var c = 'a'
+  var shortestPolymerLength = origPolymer.size
+  while (c <= 'z') {
+      var candidate = origPolymer.filter { !it.equals(c, ignoreCase = true) }.toCharArray()
+      while (keepGoing) {
+         candidate = reactPolymer(candidate)
+       }
+       keepGoing = true
+
+      if (candidate.size < shortestPolymerLength) {
+         shortestPolymerLength = candidate.size
+      }
+      ++c
+  }
+
+  println(shortestPolymerLength)
   return
 }
 
