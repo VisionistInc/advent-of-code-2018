@@ -13,6 +13,7 @@ fun main(args : Array<String>) {
   // }
   // println(newPolymer.size)
 
+  // Answer to part 2
   var c = 'a'
   var shortestPolymerLength = origPolymer.size
   while (c <= 'z') {
@@ -25,7 +26,7 @@ fun main(args : Array<String>) {
       if (candidate.size < shortestPolymerLength) {
          shortestPolymerLength = candidate.size
       }
-      ++c
+      c++
   }
 
   println(shortestPolymerLength)
