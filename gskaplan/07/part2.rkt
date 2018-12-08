@@ -119,6 +119,22 @@
        )
       )
     )
+  (for ([worker num-workers])
+    (let ([doing (vector-ref in-progress worker)])
+      (cond
+        [doing]
+        [(step-to-do)
+         (let ([my-step (step-to-do)])
+           (set! todo-pile (remove my-step todo-pile))
+           (vector-set!
+            in-progress
+            worker
+            (list (completion-time my-step) my-step)
+            )
+           )]
+        )
+      )
+    )
   (printf "~.a ~a ~a ~a ~a ~a~n"
           seconds-elapsed
           (get-log-str (vector-ref in-progress 0))
