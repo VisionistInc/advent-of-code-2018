@@ -10,24 +10,50 @@ fun main(args : Array<String>) {
   var fieldOfXCoords = (0..maxXCoord).toList()
   var fieldOfYCoords = (0..maxYCoord).toList()
   var seen = mutableListOf<Pair<Int, Int>>()
-  var overlap = mutableSetOf<Pair<Int, Int>>()
+  var overlap = mutableMapOf<Int, Pair<Int, Int>>()
 
-  for (x in fieldOfXCoords) {
-      for (y in fieldOfYCoords) {
-          var fieldPoint = Pair(x,y)
-          for ((_, value) in claimsMap) {
-              if (value.contains(fieldPoint)) {
-                  if (seen.contains(fieldPoint)) {
-                      overlap.add(fieldPoint)
-                  } else {
-                      seen.add(fieldPoint)
-                  }
-              }
+  // Answer to part 1
+  // for (x in fieldOfXCoords) {
+  //  for (y in fieldOfYCoords) {
+  //    var fieldPoint = Pair(x,y)
+  //    for ((key, value) in claimsMap) {
+  //      if (value.contains(fieldPoint)) {
+  //        if (seen.contains(fieldPoint)) {
+  //          overlap.add(fieldPoint)
+  //        } else {
+  //          seen.add(fieldPoint)
+  //        }
+  //      }
+  //    }
+  //  }
+  // }
+
+  //  println(overlap.size)
+
+  // Answer to part 2
+  for ((claimID, coords) in claimsMap) {
+    var foundInAnotherClaim = false
+    for (p in coords) {
+      for ((key, points) in claimsMap) {
+        if (key != claimID) {
+          if (p in points) {
+            foundInAnotherClaim = true
+            break
           }
+        }
       }
+
+      if (foundInAnotherClaim) {
+        break
+      }
+    }
+
+    if (!foundInAnotherClaim) {
+      println(claimID)
+    }
+    //println("$claimID is $foundInAnotherClaim")
   }
 
-  println(overlap.size)
 }
 
 private fun parseClaims(claims: List<String>): MutableMap<Int, MutableList<Pair<Int, Int>>> {
