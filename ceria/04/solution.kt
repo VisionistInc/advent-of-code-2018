@@ -43,30 +43,58 @@ fun main(args: Array<String>) {
       index++
    }
 
-  var totalTimeAsleep = 0
-  var sleepiestGuardID = 0
+  // Answer to part 1
+  // var totalTimeAsleep = 0
+  // var sleepiestGuardID = 0
+  // for ((guardID, sleepLists) in guardMap) {
+  //  var totalSleepTime = 0
+  //  for (sleepList in sleepLists) {
+  //      totalSleepTime += sleepList.last() - sleepList.first()
+  //  }
+
+  //  if (totalSleepTime > totalTimeAsleep) {
+  //    totalTimeAsleep = totalSleepTime
+  //    sleepiestGuardID = guardID
+  //  }
+  //}
+
+  // var minutesCountMap = mutableMapOf<Int, Int>()
+  // var sleepListsOfSleepiestGuard = guardMap[sleepiestGuardID]
+  // sleepListsOfSleepiestGuard?.let{
+  //  for (sleepList in sleepListsOfSleepiestGuard) {
+  //    sleepList.forEach {
+  //      minutesCountMap[it] = minutesCountMap.getOrDefault(it, 0) + 1
+  //    }
+  //  }
+  // }
+
+  // var sleepiestMinute = minutesCountMap.maxBy{ it.value }!!.key
+  // println(sleepiestGuardID * sleepiestMinute)
+
+  // Answer to part 2
+  var guardAsleepAtMinuteMap = mutableMapOf<Int, Map.Entry<Int, Int>?>()
   for ((guardID, sleepLists) in guardMap) {
-    var totalSleepTime = 0
-    for (sleepList in sleepLists) {
-        totalSleepTime += sleepList.last() - sleepList.first()
-    }
-
-    if (totalSleepTime > totalTimeAsleep) {
-      totalTimeAsleep = totalSleepTime
-      sleepiestGuardID = guardID
-    }
-  }
-
-  var minutesCountMap = mutableMapOf<Int, Int>()
-  var sleepListsOfSleepiestGuard = guardMap[sleepiestGuardID]
-  sleepListsOfSleepiestGuard?.let{
-    for (sleepList in sleepListsOfSleepiestGuard) {
-      sleepList.forEach {
-        minutesCountMap[it] = minutesCountMap.getOrDefault(it, 0) + 1
+    var minutesCountMap = mutableMapOf<Int, Int>()
+    if (sleepLists.isNotEmpty()) {
+      for (sleepList in sleepLists) {
+        sleepList.forEach {
+          minutesCountMap[it] = minutesCountMap.getOrDefault(it, 0) + 1
+        }
       }
+      guardAsleepAtMinuteMap.put(guardID, minutesCountMap.maxBy{ it.value })
     }
   }
 
-  var sleepiestMinute = minutesCountMap.maxBy{ it.value }!!.key
-  println(sleepiestGuardID * sleepiestMinute)
+  var mostAsleepMinuteFrequency = 0
+  var mostAsleepMinute = 0
+  var guardIDOfMostAsleepMinute = 0
+  for ((guard, sleepFrequencyMapEntry) in guardAsleepAtMinuteMap) {
+    if (sleepFrequencyMapEntry!!.value > mostAsleepMinuteFrequency) {
+      mostAsleepMinuteFrequency = sleepFrequencyMapEntry.value
+      mostAsleepMinute = sleepFrequencyMapEntry.key
+      guardIDOfMostAsleepMinute = guard
+    }
+  }
+
+  println(guardIDOfMostAsleepMinute * mostAsleepMinute)
 }

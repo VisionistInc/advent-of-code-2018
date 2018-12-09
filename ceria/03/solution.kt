@@ -50,8 +50,8 @@ fun main(args : Array<String>) {
 
     if (!foundInAnotherClaim) {
       println(claimID)
+      return
     }
-    //println("$claimID is $foundInAnotherClaim")
   }
 
 }
