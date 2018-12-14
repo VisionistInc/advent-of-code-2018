@@ -1,8 +1,9 @@
 claims = {}
-allClaimIDs = set()
+uniqueClaim = set()
 
 with open('./input.txt') as file:
   for line in file:
+    addToSet = True
     split = line.split()
     claimID = split[0]
     coords = split[2].split(',')
@@ -18,15 +19,12 @@ with open('./input.txt') as file:
         claim = 'R%dC%d' % (rowStart + r, colStart + c)
 
         if (claim not in claims):
-          claims[claim] = [claimID]
-        else:
-          claims[claim].append(claimID)
+          claims[claim] = claimID
+        else: # if claim clashes, remove prev seen ID
+          uniqueClaim.discard(claims[claim])
+          addToSet = False
 
-        allClaimIDs.add(claimID)
+    if (addToSet): # only add claimID if no clashing tiles
+        uniqueClaim.add(claimID)
 
-for key, value in claims.items():
-  if (len(value) > 1): # if len > 1, that means the tile is shared, void the entire claim
-    for id in value:
-      allClaimIDs.discard(id)
-
-print('unique claim: ', allClaimIDs)
+print('unique claim: ', uniqueClaim)
