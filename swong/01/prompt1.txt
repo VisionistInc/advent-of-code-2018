@@ -1,7 +1,3 @@
-Advent of Code[About][Events][Shop][Settings][Log Out]swong225 2*
-  {:year 2018}[Calendar][AoC++][Sponsors][Leaderboard][Stats]
-Our sponsors help make Advent of Code possible:
-WeAreDevelopers - Use "AOC-25", save EUR 25 and join 10^4 devs on June 6-7 at the WeAreDevelopers World Congress in Berlin ticket.get(now)
 --- Day 1: Chronal Calibration ---
 "We've detected some temporal anomalies," one of Santa's Elves at the Temporal Anomaly Research and Detection Instrument Station tells you. She sounded pretty worried when she called you down here. "At 500-year intervals into the past, someone has been changing Santa's history!"
 
