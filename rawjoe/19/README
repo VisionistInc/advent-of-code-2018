@@ -1,0 +1,167 @@
+# lets convert each line to readable lines
+# our input says r1 is PC, so lets make that change as well
+# we also know that PC adds 1 for every instructions, so we
+# add another 1 to each PC instruction
+addi 1 16 1     r1 = r1 + 16                    PC = PC + 17
+seti 1 2 5      r5 = 1                          r5 = 1
+seti 1 2 2      r2 = 1                          r2 = 1
+mulr 5 2 3      r3 = r5 * r2                    r3 = r5 * r2
+eqrr 3 4 3      r3 = 1 if r3 == r4, else 0      r3 = 1 if r3 == r4, else 0
+addr 3 1 1      r1 = r3 + r1                    PC = PC + r3 + 1
+addi 1 1 1      r1 = r1 + 1                     PC = PC + 2
+addr 5 0 0      r0 = r5 + r0                    r0 += r5
+addi 2 1 2      r2 = r2 + 1                     r2 += 1
+gtrr 2 4 3      r3 = 1 if r2 > r4, else 0       r3 = 1 if r2 > r4, else 0       
+addr 1 3 1      r1 = r1 + r3                    PC = PC + r3 + 1
+seti 2 8 1      r1 = 2                          PC = 3
+addi 5 1 5      r5 = r5 + 1                     r5 += 1
+gtrr 5 4 3      r3 = 1 if r5 > r4, else 0       r3 = 1 if r5 > r4, else 0
+addr 3 1 1      r1 = r3 + r1                    PC = PC + r3 + 1
+seti 1 1 1      r1 = 1                          PC = 2
+mulr 1 1 1      r1 = r1 * r1                    PC = (PC * PC) + 1
+addi 4 2 4      r4 = r4 + 2                     r4 += 2
+mulr 4 4 4      r4 = r4 * r4                    r4 *= r4
+mulr 1 4 4      r4 = r4 * r1                    r4 *= r1
+muli 4 11 4     r4 = r4 * 11                    r4 *= 11
+addi 3 3 3      r3 = r3 + 3                     r3 += 3
+mulr 3 1 3      r3 = r3 * r1                    r3 *= r1
+addi 3 4 3      r3 = r3 + 4                     r3 += 4
+addr 4 3 4      r4 = r4 + r3                    r4 += r3
+addr 1 0 1      r1 = r1 + r0                    PC = PC + r0 + 1
+seti 0 0 1      r1 = 0                          PC = 1
+setr 1 5 3      r3 = r1                         R3 = PC
+mulr 3 1 3      r3 = r3 * r1                    R3 *= PC
+addr 1 3 3      r3 = r3 + r1                    R3 += PC
+mulr 1 3 3      r3 = r3 * r1                    R3 *= PC
+muli 3 14 3     r3 = r3 * 14                    R3 *= 14
+mulr 3 1 3      r3 = r3 * r1                    R3 *= PC
+addr 4 3 4      r4 = r4 + r3                    R4 += R3
+seti 0 0 0      r0 = 0                          r0 = 0
+seti 0 1 1      r1 = 0                          PC = 1
+
+
+# add some labels and change PC lines to JUMPS where we can
+# the PC = PC * PC line is clearly the exit case that causes
+# the halt, so we re-label that as EXIT
+      JUMP PC17
+PC1   r5 = 1
+PC2   r2 = 1
+PC3   r3 = r5 * r2
+      r3 = 1 if r3 == r4, else 0
+      JUMP (PC6 + r3)
+PC6   JUMP PC8
+      r0 += r5
+PC8   r2 += 1
+      r3 = 1 if r2 > r4, else 0 
+      JUMP (PC11 + r3)
+PC11  JUMP PC3
+      r5 += 1
+      r3 = 1 if r5 > r4, else 0
+      JUMP (PC15 + r3)
+PC15  JUMP PC2
+      PC = 257; EXIT
+PC17  r4 += 2
+      r4 *= r4
+      r4 *= 19
+      r4 *= 11
+      r3 += 3
+      r3 *= 22
+      r3 += 4
+      r4 += r3
+      JUMP (PC26 + r0)
+PC26  JUMP PC1
+      R3 = 27
+      R3 *= 28
+      R3 += 29
+      R3 *= 30
+      R3 *= 14
+      R3 *= 32
+      R4 += R3
+      r0 = 0
+      JUMP PC1
+
+# the first instruction jumps to PC17
+# after PC17 executes, it jumps to PC1, and doesn't appear
+# to execute anymore, so it's probably init code
+# looking at PC17 onward, it looks as 17-25 execute no matter
+# what.  If r0 is 1, it will bypass the first JUMP PC1
+# all of this appears to init r4 to a vlaue based on r0
+# r3 does get set, but it gets overwritten at PC3, so it's value
+# isn't important
+# so we can remove PC17 and PC1 labels and reduce to:
+      r4 = 906 if r0 == 0 else 10551306
+      r5 = 1
+PC2   r2 = 1
+PC3   r3 = r5 * r2
+      r3 = 1 if r3 == r4, else 0
+      JUMP (PC6 + r3)
+PC6   JUMP PC8
+      r0 += r5
+PC8   r2 += 1
+      r3 = 1 if r2 > r4, else 0 
+      JUMP (PC11 + r3)
+PC11  JUMP PC3
+      r5 += 1
+      r3 = 1 if r5 > r4, else 0
+      JUMP (PC15 + r3)
+PC15  JUMP PC2
+      PC = 257; EXIT
+
+# if you look at all the JUMP that involve an extra register
+# they are adding r3 to the PC
+# in each case, r3 is being set the line before to either 0 or 1
+# based on some conditional
+# we can reduce these statements to if conditionals
+      r4 = 906 if r0 == 0 else 10551306
+      r5 = 1
+PC2   r2 = 1
+PC3   r3 = r5 * r2
+      if r3 == r4:
+        r0 += 5
+      r2 += 1
+      if r2 <= r4:
+        JUMP PC3
+      r5 += 1
+      if r5 <= r4:
+        JUMP PC2
+      EXIT
+
+# now it looks like we only exit if r5 > r4
+# so lets write this as a loop
+      r4 = 906 if r0 == 0 else 10551306
+      r5 = 1
+      while r5 <= r4:
+        r2 = 1
+PC3     r3 = r5 * r2
+        if r3 == r4:
+            r0 += 5
+        r2 += 1
+        if r2 <= r4:
+            JUMP PC3
+        r5 += 1
+
+# now we can build a loop out of the PC3 JUMP
+      r4 = 906 if r0 == 0 else 10551306
+      r5 = 1
+      while r5 <= r4:
+        r2 = 1
+        while r2 <= r4:
+            r3 = r5 * r2
+            if r3 == r4:
+                r0 += 5
+            r2 += 1
+        r5 += 1
+
+# we have two loops, each going from 1 to r4
+# for our case where r4 is 10551306, that's
+# 10551306 * 10551306 iterations!!!!!!
+# taking a closer look, r0 only gets incremented
+# if our loop vars multiply to equal r4
+# we can eliminate the inner loop by just seeing if
+# r5 divides evenly into r4
+    r4 = 906 if r0 == 0 else 10551306
+    r5 = 1
+    while r5 <= r4:
+        if r4 % r5 == 0:
+            r0 += r5
+        r5 += 1
