@@ -1,0 +1,319 @@
+# lets convert each line to readable lines
+# our input says r4 is PC, so lets make that change as well
+# we also know that PC adds 1 for every instructions, so we
+# add another 1 to each PC instruction
+
+seti 123 0 3        r3 = 123                    r3 = 123
+bani 3 456 3        r3 = r3 & 456               r3 &= 456
+eqri 3 72 3         r3 = 1 if r3 == 72, else 0  r3 = 1 if r3 == 72, else 0
+addr 3 4 4          r4 = r4 + r3                PC = PC + r3 + 1
+seti 0 0 4          r4 = 0                      PC = 1
+seti 0 2 3          r3 = 0                      r3 = 0
+bori 3 65536 2      r2 = r3 | 65536             r2 = r3 | 65536
+seti 1397714 1 3    r3 = 1397714                r3 = 1397714
+bani 2 255 5        r5 = r2 & 255               r5 = r2 & 255
+addr 3 5 3          r3 = r3 + r5                r3 += r5
+bani 3 16777215 3   r3 = r3 & 16777215          r3 &= 16777215
+muli 3 65899 3      r3 = r3 * 65899             r3 *= 65899
+bani 3 16777215 3   r3 = r3 & 16777215          r3 &= 16777215
+gtir 256 2 5        r5 = 1 if 256 > r2, else 0  r5 = 1 if 256 > r2, else 0
+addr 5 4 4          r4 = r4 + r5                PC = PC + r5 + 1
+addi 4 1 4          r4 = r4 + 1                 PC = PC + 2
+seti 27 6 4         r4 = 27                     PC = 28
+seti 0 6 5          r5 = 0                      r5 = 0
+addi 5 1 1          r1 = r5 + 1                 r1 = r5 + 1
+muli 1 256 1        r1 = r1 * 256               r1 *= 256
+gtrr 1 2 1          r1 = 1 if r1 > r2 else 0    r1 = 1 if r1 > r2 else 0
+addr 1 4 4          r4 = r4 + r1                PC = PC + r4 + 1
+addi 4 1 4          r4 = r4 + 1                 PC = PC + 2
+seti 25 2 4         r4 = 25                     PC = 26
+addi 5 1 5          r5 = r5 + 1                 r5 += 1
+seti 17 0 4         r4 = 17                     PC = 18
+setr 5 7 2          r2 = r5                     r2 = r5
+seti 7 4 4          r4 = 7                      PC = 8
+eqrr 3 0 5          r5 = 1 if r3 == r0, else 0  r5 = 1 if r3 == r0, else 0  
+addr 5 4 4          r4 = r4 + r5                PC = PC + r5 + 1
+seti 5 8 4          r4 = 5                      PC = 6
+
+# add some labels and change PC lines to JUMPS where we can
+# the PC = PC * PC line is clearly the exit case that causes
+# the halt, so we re-label that as EXIT
+        r3 = 123
+PC1     r3 &= 456
+        r3 = 1 if r3 == 72, else 0
+        PC = PC + r3 + 1
+        JUMP PC1
+        r3 = 0
+PC6     r2 = r3 | 65536
+        r3 = 1397714
+PC8     r5 = r2 & 255
+        r3 += r5
+        r3 &= 16777215
+        r3 *= 65899
+        r3 &= 16777215
+        r5 = 1 if 256 > r2, else 0
+        PC = PC + r5 + 1
+        JUMP PC17
+        JUMP PC28
+PC17    r5 = 0
+PC18    r1 = r5 + 1
+        r1 *= 256
+        r1 = 1 if r1 > r2 else 0
+        PC = PC + r4 + 1
+        JUMP PC24
+        JUMP PC26
+PC24    r5 += 1
+        JUMP PC18
+PC26    r2 = r5
+        JUMP PC8
+PC28    r5 = 1 if r3 == r0, else 0  
+        PC = PC + r5 + 1
+        JUMP PC6
+
+# Like Day 19. if you look at all the JUMP that involve an extra register
+# in each case, the register is being set the line before to either 0 or 1
+# based on some conditional
+# we can reduce these statements to if conditionals
+
+        r3 = 123
+PC1     r3 &= 456
+        if r3 != 72
+            JUMP PC1
+        r3 = 0
+PC6     r2 = r3 | 65536
+        r3 = 1397714
+PC8     r5 = r2 & 255
+        r3 += r5
+        r3 &= 16777215
+        r3 *= 65899
+        r3 &= 16777215
+        if 256 > r2:
+            JUMP PC28
+        r5 = 0
+PC18    r1 = r5 + 1
+        r1 *= 256
+        if r1 > r2:
+            JUMP PC26
+        r5 += 1
+        JUMP PC18
+PC26    r2 = r5
+        JUMP PC8
+PC28    if r3 != r0
+            JUMP PC6
+
+# the first few lines were a sanity check as described in the problem
+# the last instruction jumps to PC6 if a conditional isn't met
+# we clearly need r3 to match r0 to exit
+# so we just need to dispaly what r3 is at that point (not loop)
+
+        r3 = 0
+        r2 = r3 | 65536
+        r3 = 1397714
+PC8     r5 = r2 & 255
+        r3 += r5
+        r3 &= 16777215
+        r3 *= 65899
+        r3 &= 16777215
+        if 256 > r2:
+            JUMP PC28
+        r5 = 0
+PC18    r1 = r5 + 1
+        r1 *= 256
+        if r1 > r2:
+            JUMP PC26
+        r5 += 1
+        JUMP PC18
+PC26    r2 = r5
+        JUMP PC8
+PC28    print r3
+
+# PC28 and PC26 can only be reached from one point, so lets reduce more
+
+        r3 = 0
+        r2 = r3 | 65536
+        r3 = 1397714
+PC8     r5 = r2 & 255
+        r3 += r5
+        r3 &= 16777215
+        r3 *= 65899
+        r3 &= 16777215
+        if 256 > r2:
+            print r3
+            exit
+        r5 = 0
+PC18    r1 = r5 + 1
+        r1 *= 256
+        if r1 <= r2:
+            r5 += 1
+            JUMP PC18
+        r2 = r5
+        JUMP PC8
+
+# We can code PC8 as a loop
+# we can also code PC18 as a loop with some careful initialization
+
+    r3 = 0
+    r2 = r3 | 65536
+    r3 = 1397714
+    while True:
+        r5 = r2 & 255
+        r3 += r5
+        r3 &= 16777215
+        r3 *= 65899
+        r3 &= 16777215
+        if 256 > r2:
+            print(r3)
+            exit()
+        r5 = -1
+        r1 = r2
+        while r1 <= r2:
+            r5 += 1
+            r1 = r5 + 1
+            r1 *= 256
+        r2 = r5
+
+# we can do some analysis on the lower while loop and reduce it some more
+# it appears to be looking for the first multiple of 256 > r2
+
+    r3 = 0
+    r2 = r3 | 65536
+    r3 = 1397714
+    while True:
+        r5 = r2 & 255
+        r3 += r5
+        r3 &= 16777215
+        r3 *= 65899
+        r3 &= 16777215
+        if 256 > r2:
+            print(r3)
+            exit()
+        r1 = 1
+        while r1*256 <= r2:
+            r1 += 1
+        r2 = r1 - 1
+
+
+# Like Day 19. if you look at all the JUMP that involve an extra register
+# in each case, the register is being set the line before to either 0 or 1
+# based on some conditional
+# we can reduce these statements to if conditionals
+
+        r3 = 123
+PC1     r3 &= 456
+        if r3 != 72
+            JUMP PC1
+        r3 = 0
+PC6     r2 = r3 | 65536
+        r3 = 1397714
+PC8     r5 = r2 & 255
+        r3 += r5
+        r3 &= 16777215
+        r3 *= 65899
+        r3 &= 16777215
+        if 256 > r2:
+            JUMP PC28
+        r5 = 0
+PC18    r1 = r5 + 1
+        r1 *= 256
+        if r1 > r2:
+            JUMP PC26
+        r5 += 1
+        JUMP PC18
+PC26    r2 = r5
+        JUMP PC8
+PC28    if r3 != r0
+            JUMP PC6
+
+# Make a loop out of PC6, remove PC1 test loop
+
+    r3 = 0
+    while r3 != r0:
+        r2 = r3 | 65536
+        r3 = 1397714
+PC8     r5 = r2 & 255
+        r3 += r5
+        r3 &= 16777215
+        r3 *= 65899
+        r3 &= 16777215
+        if 256 > r2:
+            continue
+        r5 = 0
+PC18    r1 = r5 + 1
+        r1 *= 256
+        if r1 > r2:
+            JUMP PC26
+        r5 += 1
+        JUMP PC18
+PC26    r2 = r5
+        JUMP PC8
+
+# reorg to get rid of continue
+
+    r3 = 0
+    while r3 != r0:
+        r2 = r3 | 65536
+        r3 = 1397714
+PC8     r5 = r2 & 255
+        r3 += r5
+        r3 &= 16777215
+        r3 *= 65899
+        r3 &= 16777215
+        if r2 >= 256:
+            r5 = 0
+PC18        r1 = r5 + 1
+            r1 *= 256
+            if r1 > r2:
+                JUMP PC26
+            r5 += 1
+            JUMP PC18
+PC26        r2 = r5
+            JUMP PC8
+
+# reorg PC18 logic to get rid of PC26
+    r3 = 0
+    while r3 != r0:
+        r2 = r3 | 65536
+        r3 = 1397714
+PC8     r5 = r2 & 255
+        r3 += r5
+        r3 &= 16777215
+        r3 *= 65899
+        r3 &= 16777215
+        if r2 >= 256:
+            r5 = 0
+PC18        r1 = r5 + 1
+            r1 *= 256
+            if r1 <= r2:
+                r5 += 1
+                JUMP PC18
+            r2 = r5
+            JUMP PC8
+
+# looking at PC18, it looks like r5 is incremented to the highest multiple of
+# 256 that is under r2, so we can reduce the loop to
+    r3 = 0
+    while r3 != r0:
+        r2 = r3 | 65536
+        r3 = 1397714
+PC8     r5 = r2 & 255
+        r3 += r5
+        r3 &= 16777215
+        r3 *= 65899
+        r3 &= 16777215
+        if r2 >= 256:
+            r2 = r2 // 256
+            JUMP PC8
+
+# looking at PC18, it looks like r5 is incremented to the highest multiple of
+# 256 that is under r2, so we can reduce the loop to
+    r3 = 0
+    while r3 != r0:
+        r2 = r3 | 65536
+        r3 = 1397714
+        while r2 > 256:
+            r2 = r2 // 256
+            r5 = r2 & 255
+            r3 += r5
+            r3 &= 16777215
+            r3 *= 65899
+            r3 &= 16777215
